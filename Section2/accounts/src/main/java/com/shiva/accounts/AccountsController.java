@@ -9,6 +9,8 @@ public class AccountsController {
     @GetMapping("sayHello")
     public String sayHello()
     {
+        System.out.println("controller");
         return "Hi World";
+
     }
 }
