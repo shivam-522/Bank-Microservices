@@ -26,4 +26,14 @@ public class AccountsController {
                 .body(new ResponseDto(AccountsConstants.STATUS_201,AccountsConstants.MESSAGE_201));// This will go in the response body
     }
 
+    @GetMapping("/fetch")
+    public ResponseEntity<CustomerDto> fetchAccountDetails(@RequestParam String mobileNumber) {
+        /** This method will  take the phone number as query parameter and return the customer details from database **/
+
+        CustomerDto customerDto= iAccountsService.fetchAccount(mobileNumber);
+
+        return ResponseEntity.status(HttpStatus.OK).body(customerDto);
+    }
+
+
 }

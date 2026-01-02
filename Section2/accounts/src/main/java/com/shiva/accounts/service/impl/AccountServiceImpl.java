@@ -1,10 +1,13 @@
 package com.shiva.accounts.service.impl;
 
 import com.shiva.accounts.constants.AccountsConstants;
+import com.shiva.accounts.dto.AccountsDto;
 import com.shiva.accounts.dto.CustomerDto;
 import com.shiva.accounts.entity.Accounts;
 import com.shiva.accounts.entity.Customer;
 import com.shiva.accounts.exception.CustomerAlreadyExistsException;
+import com.shiva.accounts.exception.ResourceNotFoundException;
+import com.shiva.accounts.mapper.AccountsMapper;
 import com.shiva.accounts.mapper.CustomerMapper;
 import com.shiva.accounts.repository.AccountsRepository;
 import com.shiva.accounts.repository.CustomerRepository;
@@ -44,6 +47,8 @@ public class AccountServiceImpl implements IAccountsService {
 
 
     }
+
+
     private Accounts createNewAccount(Customer customer) {
         Accounts newAccount = new Accounts();
         newAccount.setCustomerId(customer.getCustomerId());
@@ -56,5 +61,20 @@ public class AccountServiceImpl implements IAccountsService {
         newAccount.setCreatedBy("Anonymous");
         return newAccount;
     }
+
+    @Override
+    public CustomerDto fetchAccount(String mobileNumber) {
+        Customer customer=customerRepository.findByMobileNumber(mobileNumber).orElseThrow(
+                ()->new ResourceNotFoundException("Customer","mobileNumber",mobileNumber));
+
+        Accounts accounts=accountsRepository.findByCustomerId(customer.getCustomerId()).orElseThrow(
+                ()->new ResourceNotFoundException("Account","customerId",String.valueOf(customer.getCustomerId()))
+        );
+
+        CustomerDto customerDto=CustomerMapper.mapToCustomerDto(customer,new CustomerDto());
+        customerDto.setAccountsDto(AccountsMapper.mapToAccountsDto(accounts,new AccountsDto()));
+        return customerDto;
+    }
+
 
 }
