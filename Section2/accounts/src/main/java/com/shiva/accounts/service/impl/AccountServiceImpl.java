@@ -76,5 +76,30 @@ public class AccountServiceImpl implements IAccountsService {
         return customerDto;
     }
 
+    @Override
+    public boolean updateAccount(CustomerDto customerDto) {
+        boolean isUpdate=false;
+        AccountsDto accountsDto=customerDto.getAccountsDto();
+        if(accountsDto !=null)
+        {
+            /** Here since our Account number is the primary key of Accounts table so directly we can use findById method that is available in Spring Data JPA Framework
+             * Whenever call go for findById my spring data JPA framework will go for the accounts entity and check what is the primary key column  and then it will fetch the account details**/
+            Accounts accounts=accountsRepository.findById(accountsDto.getAccountNumber()).orElseThrow(
+                    ()->new ResourceNotFoundException("Account","AccountNumber",accountsDto.getAccountNumber().toString())
+            );
+            AccountsMapper.mapToAccounts(accountsDto,accounts);
+            accounts=accountsRepository.save(accounts);
+
+            Long customerId=accounts.getCustomerId();
+            Customer customer=customerRepository.findById(customerId).orElseThrow(
+                    ()->new ResourceNotFoundException("customer","customerID",customerId.toString())
+            );
+            CustomerMapper.mapToCustomer(customerDto,customer);
+            customerRepository.save(customer);
+            isUpdate=true;
+        }
+        return isUpdate;
+    }
+
 
 }
