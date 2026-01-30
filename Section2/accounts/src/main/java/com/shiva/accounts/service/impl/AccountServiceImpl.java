@@ -101,5 +101,16 @@ public class AccountServiceImpl implements IAccountsService {
         return isUpdate;
     }
 
+    @Override
+    public boolean deleteAccount(String mobileNumber) {
+        Customer customer =customerRepository.findByMobileNumber(mobileNumber).orElseThrow(
+                ()->new ResourceNotFoundException("Customer","mobileNumber",mobileNumber)
+        );
+        accountsRepository.deleteByCustomerId(customer.getCustomerId());/** Since the customerId is not the primary key in the accounts
+         table so we need to write this method manually it is not byDefault provided by SpringBoot **/
+        customerRepository.deleteById(customer.getCustomerId());
+        return true;
+    }
+
 
 }
